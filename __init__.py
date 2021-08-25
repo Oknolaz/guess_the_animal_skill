@@ -8,6 +8,11 @@ animal_naming = ("Оно", "Животное", "Это животное", "Мо�
 
 
 class GuessTheAnimal(Skill):
+
+    def temp_dir(self):
+        tmp = super(GuessTheAnimal, self).get_temp_dir()
+        return tmp
+    
     def first_run(self, user_message):
         # Вызывается при активации триггера, затем навык перехватывает ввод пользователя.
         if super(GuessTheAnimal, self)._is_triggered(user_message, super(GuessTheAnimal, self)._get_triggers()):
@@ -17,7 +22,7 @@ class GuessTheAnimal(Skill):
                 animals_keys.append(i)
             animal = random.choice(animals_keys)
 
-            with open("vasisualy/skills/guess_the_animal/.animal", 'w') as f:
+            with open(f"{self.temp_dir()}/.animal", 'w') as f:
                 f.write(animal)
 
             descriptions = animals[animal].split("/")
@@ -26,7 +31,7 @@ class GuessTheAnimal(Skill):
             second_description = random.choice(descriptions)
             descriptions.remove(second_description)
 
-            with open("vasisualy/skills/guess_the_animal/.descriptions", 'w') as f:
+            with open(f"{self.temp_dir()}/.descriptions", 'w') as f:
                 for description in descriptions:
                     f.write(description + "\n")
 
@@ -41,7 +46,7 @@ class GuessTheAnimal(Skill):
     def main(self, user_message):
         # Вызывается, когда навык активирован и существует файл блокировки, перехватывает
         # все сообщения, введённые пользователем.
-        with open("vasisualy/skills/guess_the_animal/.animal", 'r') as f:
+        with open(f"{self.temp_dir()}/.animal", 'r') as f:
             animal = f.read()
 
         if super(GuessTheAnimal, self)._is_triggered_to_exit(user_message, super(GuessTheAnimal, self)._get_exit_triggers()):
@@ -52,7 +57,7 @@ class GuessTheAnimal(Skill):
             return toSpeak
 
         elif ("подсказка" in user_message) or ("Подсказка" in user_message):
-            with open("vasisualy/skills/guess_the_animal/.descriptions", 'r') as f:
+            with open(f"{self.temp_dir()}/.descriptions", 'r') as f:
                 descriptions = []
                 lines = f.read()
 
@@ -65,7 +70,7 @@ class GuessTheAnimal(Skill):
             toSpeak = f"{random.choice(animal_naming)} {s_description}." if s_description else "Подсказок больше нет!"
             if s_description: descriptions.remove(s_description)
 
-            with open("vasisualy/skills/guess_the_animal/.descriptions", 'w') as f:
+            with open(f"{self.temp_dir()}/.descriptions", 'w') as f:
                 for description in descriptions:
                     f.write(description + '\n')
 
@@ -77,8 +82,8 @@ class GuessTheAnimal(Skill):
             super(GuessTheAnimal, self).exit_loop()  # Завершение цикла.
 
             # Удаление временных файлов.
-            os.remove("vasisualy/skills/guess_the_animal/.animal")
-            os.remove("vasisualy/skills/guess_the_animal/.descriptions")
+            os.remove(f"{self.temp_dir()}/.animal")
+            os.remove(f"{self.temp_dir()}/.descriptions")
             return toSpeak
 
         else:
