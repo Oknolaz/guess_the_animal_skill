@@ -76,7 +76,7 @@ class GuessTheAnimal(Skill):
 
             return toSpeak
 
-        elif (user_message == animal.capitalize()) or (user_message == animal):
+        elif animal in user_message.lower():
             toSpeak = "Поздравляю, я загадал именно это животное!"
 
             super(GuessTheAnimal, self).exit_loop()  # Завершение цикла.
